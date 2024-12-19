@@ -2,9 +2,9 @@
 
 <template>
   <div>
-    <header>預設模板的表頭</header>
+    <AppHeader />
     <slot />
-    <footer>預設模板的表尾</footer>
+    <AppFooter />
   </div>
 </template>
 

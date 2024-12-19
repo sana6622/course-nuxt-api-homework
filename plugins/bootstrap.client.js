@@ -1,5 +1,19 @@
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+import * as bootstrap from 'bootstrap';
+const { Modal, Collapse } = bootstrap;
+
+export default defineNuxtPlugin(_nuxtApp => {
+  return {
+    provide: {
+      bootstrap: {
+        modal: element => new Modal(element),
+        collapse: element => new Collapse(element)
+      }
+    }
+  };
+});
+
 
 // import 'bootstrap/js/dist/collapse';
 // import Collapse from "bootstrap/js/dist/collapse";
@@ -35,10 +49,10 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
 
-import { Modal } from 'bootstrap';
+// import { Modal } from 'bootstrap';
 
-export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.provide('bootstrap', {
-    Modal: (element, options) => new Modal(element, options),
-  });
-});
+// export default defineNuxtPlugin((nuxtApp) => {
+//   nuxtApp.provide('bootstrap', {
+//     Modal: (element, options) => new Modal(element, options),
+//   });
+// });
