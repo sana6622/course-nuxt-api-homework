@@ -95,6 +95,7 @@ const confirmDateOnMobile = () => {
 
 const confirmDate = () => {
   const isMobile = mapCurrent({ md: false }, true);
+  console.log("confirmDate", tempDate.date);
 
   if (isMobile.value) {
     emit("handleDateChange", {
@@ -149,12 +150,15 @@ const clearDate = () => {
             </h3>
             <div v-else class="d-flex align-items-center gap-4">
               <h3 class="modal-title mb-0 text-neutral-100 fs-6 fw-bold">
-                {{ daysCount }} 晚
+                {{ daysCount }} 晚-
               </h3>
               <div class="d-flex gap-2 text-neutral-80 fs-8 fw-medium">
-                <span>{{ formatDateTitle(tempDate.date.start) }}</span>
+                <!-- <span>{{ formatDateTitle(tempDate.date.start) }}</span>
                 -
-                <span>{{ formatDateTitle(tempDate.date.end) }}</span>
+                <span>{{ formatDateTitle(tempDate.date.end) }}</span> -->
+                <span v-formatDate="tempDate.date.start"></span>
+                -
+                <span v-formatDate="tempDate.date.end"></span>
               </div>
             </div>
           </div>
@@ -162,15 +166,15 @@ const clearDate = () => {
         <div class="d-none d-md-flex modal-header gap-15 p-8 pb-0 border-0">
           <div>
             <h3 class="modal-title mb-2 text-neutral-100 fs-5 fw-bold">
-              {{ daysCount }} 晚
+              {{ daysCount }} 晚--
             </h3>
             <div class="d-flex gap-2 text-neutral-80 fw-medium">
               <!-- <span>{{ tempDate.date.start?.replaceAll("-", " / ") }}</span>
               -
               <span>{{ tempDate.date.end?.replaceAll("-", " / ") }}</span> -->
-              <span>{{ formatDateTitle(tempDate.date.start) }}</span>
+              <span v-formatDate="tempDate.date.start"></span>
               -
-              <span>{{ formatDateTitle(tempDate.date.end) }}</span>
+              <span v-formatDate="tempDate.date.end"></span>
             </div>
           </div>
 
@@ -298,7 +302,7 @@ const clearDate = () => {
             </button>
             <button
               type="button"
-              class="btn btn-primary-100 flex-grow-1 flex-md-grow-0 px-8 py-4 text-neutral-0 fw-bold rounded-3"
+              class="btn btn-primary-100 flex-grow-1 flex-md-grow-0 px-8 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
               @click="confirmDate"
             >
               儲存
