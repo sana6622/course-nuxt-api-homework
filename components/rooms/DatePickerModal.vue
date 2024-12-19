@@ -5,13 +5,17 @@ import { DatePicker } from "v-calendar";
 import "v-calendar/style.css";
 import { useScreens } from "vue-screen-utils";
 
-import Modal from "bootstrap/js/dist/modal";
+// import Modal from "bootstrap/js/dist/modal";
 import { Icon } from "@iconify/vue";
+
+const { $bootstrap } = useNuxtApp();
+const modalRef = ref(null);
 
 const modal = ref(null);
 
 onMounted(() => {
-  modal.value = new Modal(document.getElementById("dateModal"));
+  // modal.value = new Modal(document.getElementById("dateModal"));
+  modal.value = $bootstrap.modal(modalRef.value);
 });
 
 const openModal = () => {
@@ -60,7 +64,11 @@ const columns = mapCurrent({ md: 2 }, 1);
 const expanded = mapCurrent({ md: false }, true);
 const titlePosition = mapCurrent({ md: "center" }, "left");
 
-const formatDateTitle = (date) => date?.replaceAll("-", " / ");
+const formatDateTitle = (date) => {
+  if (!date) return ""; // 如果 date 是 null，返回空字符串
+  console.log("date", String(date).replaceAll("-", " / "));
+  return String(date).replaceAll("-", " / ");
+};
 
 const daysCount = computed(() => {
   const startDate = tempDate.date.start;
@@ -112,7 +120,14 @@ const clearDate = () => {
 </script>
 
 <template>
-  <div id="dateModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div
+    id="dateModal"
+    class="modal fade"
+    tabindex="-1"
+    aria-hidden="true"
+    ref="modalRef"
+  >
+    <div>{{ dateTime }}</div>
     <div class="modal-dialog modal-dialog-centered m-0 mt-9 mx-md-auto">
       <div
         :class="{ 'mt-auto': isConfirmDateOnMobile }"
@@ -150,9 +165,12 @@ const clearDate = () => {
               {{ daysCount }} 晚
             </h3>
             <div class="d-flex gap-2 text-neutral-80 fw-medium">
-              <span>{{ tempDate.date.start?.replaceAll("-", " / ") }}</span>
+              <!-- <span>{{ tempDate.date.start?.replaceAll("-", " / ") }}</span>
               -
-              <span>{{ tempDate.date.end?.replaceAll("-", " / ") }}</span>
+              <span>{{ tempDate.date.end?.replaceAll("-", " / ") }}</span> -->
+              <span>{{ formatDateTitle(tempDate.date.start) }}</span>
+              -
+              <span>{{ formatDateTitle(tempDate.date.end) }}</span>
             </div>
           </div>
 
@@ -196,9 +214,10 @@ const clearDate = () => {
         </div>
         <div class="modal-body px-6 px-md-8 py-0">
           <div v-if="!isConfirmDateOnMobile" class="date-picker">
-            <DatePicker
+            <VDatePicker
               :key="tempDate.key"
               v-model="tempDate.date"
+              is-range
               color="primary"
               :masks="masks"
               :first-day-of-week="1"
@@ -261,7 +280,7 @@ const clearDate = () => {
           </button>
           <button
             type="button"
-            class="btn btn-primary-100 flex-grow-1 flex-md-grow-0 px-8 py-4 text-neutral-0 fw-bold rounded-3"
+            class="btn btn-primary-100 flex-grow-1 flex-md-grow-0 px-8 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
             @click="confirmDate"
           >
             確定日期
@@ -295,7 +314,7 @@ const clearDate = () => {
             </button>
             <button
               type="button"
-              class="btn btn-primary-100 flex-grow-1 flex-md-grow-0 px-8 py-4 text-neutral-0 fw-bold rounded-3"
+              class="btn btn-primary-100 flex-grow-1 flex-md-grow-0 px-8 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
               @click="confirmDateOnMobile"
             >
               確定日期
@@ -394,5 +413,11 @@ const clearDate = () => {
 
 .date-picker :deep(.vc-attr) {
   --vc-highlight-outline-bg: #000000;
+}
+.bt-bgc {
+  background-color: #bf9d7d;
+  &:hover {
+    background-color: #a2856a;
+  }
 }
 </style>

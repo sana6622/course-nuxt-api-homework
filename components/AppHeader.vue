@@ -104,7 +104,7 @@ onUnmounted(() => {
                 :to="{
                   name: 'rooms',
                 }"
-                class="btn btn-primary-100 px-8 py-4 text-white fw-bold border-0 rounded-3"
+                class="btn btn-primary-100 px-8 py-4 text-white fw-bold border-0 rounded-3 bt-bgc"
               >
                 立即訂房
               </NuxtLink>
@@ -128,6 +128,12 @@ $grid-breakpoints: (
   xxl: 1400px,
   xxxl: 1537px,
 );
+.bt-bgc {
+  background-color: #bf9d7d;
+  &:hover {
+    background-color: #a2856a;
+  }
+}
 
 .logo {
   max-width: 27vw;

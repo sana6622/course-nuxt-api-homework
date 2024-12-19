@@ -485,7 +485,7 @@ const confirmBooking = () => {
               </div>
 
               <button
-                class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3"
+                class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
                 type="button"
                 @click="confirmBooking"
               >
@@ -514,6 +514,12 @@ $grid-breakpoints: (
   xxxl: 1537px,
 );
 
+.bt-bgc {
+  background-color: #bf9d7d;
+  &:hover {
+    background-color: #a2856a;
+  }
+}
 .title-deco {
   display: flex;
   align-items: center;

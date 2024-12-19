@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive } from "vue";
 
-// import DatePickerModal from "@/components/rooms/DatePickerModal.vue";
+import DatePickerModal from "@/components/rooms/DatePickerModal.vue";
 import { Icon } from "@iconify/vue";
 
 const datePickerModal = ref(null);
@@ -27,11 +27,11 @@ const currentDate = new Date();
 
 const bookingDate = reactive({
   date: {
-    start: formatDate(currentDate),
+    start: null,
     end: null,
   },
-  minDate: new Date(),
-  maxDate: new Date(currentDate.setFullYear(currentDate.getFullYear() + 1)),
+  minDate: null,
+  maxDate: null,
 });
 
 const handleDateChange = (bookingInfo) => {
@@ -42,6 +42,17 @@ const handleDateChange = (bookingInfo) => {
   bookingPeople.value = bookingInfo?.people || 1;
   daysCount.value = bookingInfo.daysCount;
 };
+
+onMounted(() => {
+  const currentDate = new Date();
+  bookingDate.date.start = formatDate(currentDate);
+  bookingDate.minDate = currentDate;
+  bookingDate.maxDate = new Date(
+    currentDate.getFullYear() + 1,
+    currentDate.getMonth(),
+    currentDate.getDate()
+  );
+});
 </script>
 
 <template>
@@ -505,15 +516,15 @@ const handleDateChange = (bookingInfo) => {
               </div>
 
               <h5 class="mb-0 text-primary-100 fw-bold">NT$ 10,000</h5>
-              <!-- <NuxtLink
+              <NuxtLink
                 :to="{
-                  name: 'booking',
+                  name: 'rooms-roomId-booking',
                   params: { roomId: $route.params.roomId },
                 }"
-                class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3"
+                class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
               >
                 立即預訂
-              </NuxtLink> -->
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -525,7 +536,7 @@ const handleDateChange = (bookingInfo) => {
         <template v-if="bookingDate.date.end === null">
           <small class="text-neutral-80 fw-medium">ＮＴ$ 10,000 / 晚</small>
           <button
-            class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3"
+            class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
             type="button"
             @click="openModal"
           >
@@ -543,21 +554,24 @@ const handleDateChange = (bookingInfo) => {
               {{ daysFormatOnMobile(bookingDate.date?.end) }}</span
             >
           </div>
-          <!-- <NuxtLink
-            :to="{ name: 'booking', params: { roomId: $route.params.roomId } }"
-            class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3"
+          <NuxtLink
+            :to="{
+              name: 'rooms-roomId-booking',
+              params: { roomId: $route.params.roomId },
+            }"
+            class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
           >
             立即預訂
-          </NuxtLink> -->
+          </NuxtLink>
         </template>
       </div>
     </section>
 
-    <!-- <DatePickerModal
+    <DatePickerModal
       ref="datePickerModal"
       :date-time="bookingDate"
       @handle-date-change="handleDateChange"
-    /> -->
+    />
   </main>
 </template>
 
@@ -573,6 +587,12 @@ $grid-breakpoints: (
   xxl: 1400px,
   xxxl: 1537px,
 );
+.bt-bgc {
+  background-color: #bf9d7d;
+  &:hover {
+    background-color: #a2856a;
+  }
+}
 
 .rounded-3xl {
   border-radius: 1.25rem;
