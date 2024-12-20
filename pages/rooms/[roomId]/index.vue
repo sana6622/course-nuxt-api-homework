@@ -1,6 +1,6 @@
 <script setup>
-import { ref, reactive } from "vue";
-
+import { reactive } from "vue";
+const { $formatDate } = useNuxtApp();
 import DatePickerModal from "@/components/rooms/DatePickerModal.vue";
 import { Icon } from "@iconify/vue";
 
@@ -15,7 +15,12 @@ const bookingPeople = ref(1);
 
 const daysCount = ref(0);
 
-const daysFormatOnMobile = (date) => date?.split("-").slice(1, 3).join(" / ");
+const daysFormatOnMobile = (date) => {
+  if (date != "") {
+    return $formatDate(date, "mobile");
+  }
+  return ""; // 如果 date 無效或不是字串，返回空字串
+};
 
 const formatDate = (date) => {
   const offsetToUTC8 = date.getHours() + 8;
@@ -43,9 +48,11 @@ const handleDateChange = (bookingInfo) => {
   daysCount.value = bookingInfo.daysCount;
 };
 
-onMounted(() => {
+onBeforeMount(() => {
   const currentDate = new Date();
-  bookingDate.date.start = formatDate(currentDate);
+  console.log("currnet", currentDate);
+  bookingDate.date.start = $formatDate(currentDate, "iso");
+  console.log("bookingDate.date", bookingDate.date);
   bookingDate.minDate = currentDate;
   bookingDate.maxDate = new Date(
     currentDate.getFullYear() + 1,
@@ -408,6 +415,7 @@ onMounted(() => {
 
               <div>
                 <div class="d-flex flex-wrap gap-2 mb-4">
+                  <div>{{ bookingDate.date.start }}</div>
                   <div class="form-floating flex-grow-1 flex-shrink-1">
                     <input
                       id="checkinInput"
@@ -525,6 +533,7 @@ onMounted(() => {
             <small class="text-neutral-80 fw-medium"
               >ＮＴ$ 10,000 / {{ daysCount }} 晚 / {{ bookingPeople }} 人</small
             >
+
             <span class="text-neutral fs-9 fw-medium text-decoration-underline"
               >{{ daysFormatOnMobile(bookingDate.date?.start) }} -
               {{ daysFormatOnMobile(bookingDate.date?.end) }}</span

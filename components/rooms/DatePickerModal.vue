@@ -4,6 +4,8 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { DatePicker } from "v-calendar";
 import "v-calendar/style.css";
 import { useScreens } from "vue-screen-utils";
+import { format } from "date-fns";
+const { $formatDate } = useNuxtApp();
 
 // import Modal from "bootstrap/js/dist/modal";
 import { Icon } from "@iconify/vue";
@@ -118,6 +120,21 @@ const clearDate = () => {
   tempDate.date.end = null;
   tempDate.key++;
 };
+
+const formattedStartDate = computed(() => {
+  return $formatDate(tempDate.date.start);
+});
+
+const formattedEndDate = computed(() => {
+  return $formatDate(tempDate.date.end);
+});
+const formattedStartDateISO = computed(() => {
+  return $formatDate(tempDate.date.start, "iso");
+});
+
+const formattedEndDateISO = computed(() => {
+  return $formatDate(tempDate.date.end, "iso");
+});
 </script>
 
 <template>
@@ -153,12 +170,7 @@ const clearDate = () => {
                 {{ daysCount }} 晚-
               </h3>
               <div class="d-flex gap-2 text-neutral-80 fs-8 fw-medium">
-                <!-- <span>{{ formatDateTitle(tempDate.date.start) }}</span>
-                -
-                <span>{{ formatDateTitle(tempDate.date.end) }}</span> -->
-                <span v-formatDate="tempDate.date.start"></span>
-                -
-                <span v-formatDate="tempDate.date.end"></span>
+                <span>{{ formattedStartDate }}-{{ formattedEndDate }}</span>
               </div>
             </div>
           </div>
@@ -169,12 +181,7 @@ const clearDate = () => {
               {{ daysCount }} 晚--
             </h3>
             <div class="d-flex gap-2 text-neutral-80 fw-medium">
-              <!-- <span>{{ tempDate.date.start?.replaceAll("-", " / ") }}</span>
-              -
-              <span>{{ tempDate.date.end?.replaceAll("-", " / ") }}</span> -->
-              <span v-formatDate="tempDate.date.start"></span>
-              -
-              <span v-formatDate="tempDate.date.end"></span>
+              <span>{{ formattedStartDate }}-{{ formattedEndDate }}</span>
             </div>
           </div>
 
@@ -184,8 +191,8 @@ const clearDate = () => {
                 id="checkInDate"
                 readonly
                 type="date"
-                :value="tempDate.date.start"
-                class="form-control p-4 pt-9 text-neutral-100 fw-medium border-neutral-100 rounded-3"
+                :value="formattedStartDateISO"
+                class="form-control p-4 pb-1 text-neutral-100 fw-medium border-neutral-100 rounded-3"
                 style="min-height: 74px"
                 placeholder="yyyy-mm-dd"
               />
@@ -202,8 +209,8 @@ const clearDate = () => {
                 id="checkoutDate"
                 type="date"
                 readonly
-                :value="tempDate.date.end"
-                class="form-control p-4 pt-9 text-neutral-100 fw-medium border-neutral-100 rounded-3"
+                :value="formattedEndDateISO"
+                class="form-control p-4 pb-1 text-neutral-100 fw-medium border-neutral-100 rounded-3"
                 style="min-height: 74px"
                 placeholder="yyyy-mm-dd"
               />
