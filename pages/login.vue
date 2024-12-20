@@ -2,7 +2,11 @@
 definePageMeta({
   layout: "account-layout",
 });
-// import { RouterLink } from "vue-router";
+const router = useRouter();
+
+const login = () => {
+  router.push("user/1");
+};
 </script>
 
 <template>
@@ -61,6 +65,7 @@ definePageMeta({
       <button
         class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold"
         type="button"
+        @click="login"
       >
         會員登入
       </button>

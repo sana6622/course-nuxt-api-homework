@@ -444,7 +444,7 @@ const confirmBooking = () => {
             >
               <img
                 class="img-fluid rounded-3"
-                src="@/assets/images/room-a-1.png"
+                src="/images/room-a-1.png"
                 alt="room-a"
               />
 

@@ -1,3 +1,9 @@
+<script setup>
+definePageMeta({
+  layout: "user-layout",
+});
+</script>
+
 <template>
-  <div>user index</div>
+  <div></div>
 </template>

@@ -1,11 +1,8 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+// import { ref, onMounted, onUnmounted, computed } from "vue";
+import { useRoute } from "vue-router";
 import { Icon } from "@iconify/vue";
 const { $bootstrap } = useNuxtApp();
-
-// import 'bootstrap/js/dist/collapse';
-// import 'bootstrap/js/dist/dropdown';
 
 const route = useRoute();
 const transparentBgRoute = ["home", "rooms"];
@@ -62,12 +59,7 @@ onUnmounted(() => {
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="navbar-nav gap-4 ms-auto fw-bold">
             <li class="nav-item">
-              <NuxtLink
-                :to="{
-                  name: 'rooms',
-                }"
-                class="nav-link p-4 text-neutral-0"
-              >
+              <NuxtLink to="/rooms" class="nav-link p-4 text-neutral-0">
                 客房旅宿
               </NuxtLink>
             </li>
@@ -95,7 +87,7 @@ onUnmounted(() => {
               </div>
             </li>
             <li class="d-md-none nav-item">
-              <NuxtLink to="/" class="nav-link p-4 text-neutral-0">
+              <NuxtLink to="/login" class="nav-link p-4 text-neutral-0">
                 會員登入
               </NuxtLink>
             </li>
