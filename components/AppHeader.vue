@@ -78,7 +78,12 @@ onUnmounted(() => {
                   style="right: 0; left: auto; border-radius: 20px"
                 >
                   <li>
-                    <a class="dropdown-item px-6 py-4" href="#">我的帳戶</a>
+                    <NuxtLink
+                      :to="{ name: 'user-userId', params: { userId: '123' } }"
+                      class="dropdown-item px-6 py-4"
+                    >
+                      我的帳戶
+                    </NuxtLink>
                   </li>
                   <li>
                     <a class="dropdown-item px-6 py-4" href="#">登出</a>

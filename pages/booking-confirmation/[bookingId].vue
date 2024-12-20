@@ -1,9 +1,12 @@
 <script setup>
 import { Icon } from "@iconify/vue";
-import { useRoute } from "vue-router";
+const router = useRouter();
 
 const route = useRoute();
 const { bookingId } = route.params;
+const clickHandle = () => {
+  router.push("/user/1/order");
+};
 </script>
 
 <template>
@@ -34,8 +37,9 @@ const { bookingId } = route.params;
               立即查看您的訂單紀錄
             </h2>
             <button
-              class="btn btn-primary-100 px-md-15 py-4 text-neutral-0 fw-bold border-0 rounded-3"
+              class="btn btn-primary-100 px-md-15 py-4 text-neutral-0 fw-bold border-0 rounded-3 bt-bgc"
               type="button"
+              @click="clickHandle"
             >
               前往我的訂單
             </button>
@@ -304,6 +308,13 @@ $grid-breakpoints: (
 
 .rounded-3xl {
   border-radius: 1.25rem;
+}
+
+.bt-bgc {
+  background-color: #bf9d7d;
+  &:hover {
+    background-color: #a2856a;
+  }
 }
 
 .title-deco {
