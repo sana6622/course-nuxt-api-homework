@@ -422,7 +422,7 @@ onBeforeMount(() => {
                       readonly
                       type="date"
                       :value="bookingDate.date.start"
-                      class="form-control p-4 pt-9 text-neutral-100 fw-medium border-neutral-100 rounded-3"
+                      class="form-control p-4 pb-0 text-neutral-100 fw-medium border-neutral-100 rounded-3"
                       style="min-height: 74px"
                       placeholder="yyyy-mm-dd"
                       @click="openModal"
@@ -441,7 +441,7 @@ onBeforeMount(() => {
                       readonly
                       type="date"
                       :value="bookingDate.date.end"
-                      class="form-control p-4 pt-9 text-neutral-100 fw-medium border-neutral-100 rounded-3"
+                      class="form-control p-4 pb-0 text-neutral-100 fw-medium border-neutral-100 rounded-3"
                       style="min-height: 74px"
                       placeholder="yyyy-mm-dd"
                       @click="openModal"

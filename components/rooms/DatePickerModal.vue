@@ -97,17 +97,19 @@ const confirmDateOnMobile = () => {
 
 const confirmDate = () => {
   const isMobile = mapCurrent({ md: false }, true);
-  console.log("confirmDate", tempDate.date);
-
+  const date = {
+    start: $formatDate(tempDate.date.start, "iso"),
+    end: $formatDate(tempDate.date.end, "iso"),
+  };
   if (isMobile.value) {
     emit("handleDateChange", {
-      date: tempDate.date,
+      date: date,
       people: bookingPeopleMobile,
       daysCount,
     });
   } else {
     emit("handleDateChange", {
-      date: tempDate.date,
+      date: date,
       daysCount,
     });
   }
