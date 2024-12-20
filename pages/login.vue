@@ -2,7 +2,7 @@
 definePageMeta({
   layout: "account-layout",
 });
-import { RouterLink } from "vue-router";
+// import { RouterLink } from "vue-router";
 </script>
 
 <template>
@@ -68,12 +68,12 @@ import { RouterLink } from "vue-router";
 
     <p class="mb-0 fs-8 fs-md-7">
       <span class="me-2 text-neutral-0 fw-medium">沒有會員嗎？</span>
-      <RouterLink
+      <NuxtLink
         to="signup"
         class="text-primary-100 fw-bold text-decoration-underline bg-transparent border-0"
       >
         <span>前往註冊</span>
-      </RouterLink>
+      </NuxtLink>
     </p>
   </div>
 </template>
