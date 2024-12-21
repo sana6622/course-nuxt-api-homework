@@ -2,7 +2,7 @@ export const useThousandSeparator = () => {
     /*千分位格式*/
     const thousandSeparator = (value, separator = ",") => {
       if (isNaN(value)) {
-        return "Invalid Value"; // 如果不是數字，返回提示
+        return "0"; // 如果不是數字，返回提示
       }
       const number = parseFloat(value); // 將輸入值轉換為浮點數
       return number

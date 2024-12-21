@@ -16,7 +16,8 @@ const datePickerModal = ref(null);
 const MAX_BOOKING_PEOPLE = 10;
 const bookingPeople = ref(1);
 const daysCount = ref(0);
-
+const price =ref(0);
+const { thousandSeparator } = useThousandSeparator(); 
 
 const openModal = () => {
   datePickerModal.value.openModal();
@@ -49,8 +50,8 @@ const handleDateChange = (bookingInfo) => {
   bookingDate.date.start = start;
   bookingDate.date.end = end;
 
-  bookingPeople.value = bookingInfo?.people || 1;
-  daysCount.value = bookingInfo.daysCount;
+  bookingPeople.value = bookingInfo?.people?.value || 1;
+  daysCount.value = bookingInfo.daysCount;  
 };
 
 const getRoomData = async(id) => {
@@ -60,12 +61,17 @@ const getRoomData = async(id) => {
       baseURL: config.public.apiBaseURL,
     });
     roomData.value = data.result
+    price.value = roomData.value.price
     console.log('roomData.value',roomData.value)
   } catch (error) {
     console.error('Error fetching rooms:', error);
   }
 
 }
+const totalPrice = computed(()=>{
+   return bookingPeople.value*daysCount.value.value*price.value
+})
+
 onBeforeMount(() => {   
   const currentDate = new Date(); 
   bookingDate.date.start = $formatDate(currentDate, "iso");  
@@ -125,9 +131,9 @@ onMounted(()=>{
         <div class="row">
           <div class="col-12 col-md-7 d-flex flex-column gap-6 gap-md-20">
             <div>
-              <h1 class="mb-4 text-neutral-100 fw-bold">尊爵雙人房</h1>
+              <h1 class="mb-4 text-neutral-100 fw-bold">{{ roomData.name }}</h1>
               <p class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-medium">
-                享受高級的住宿體驗，尊爵雙人房提供給您舒適寬敞的空間和精緻的裝潢。
+                {{ roomData.description }}
               </p>
             </div>
 
@@ -139,7 +145,7 @@ onMounted(()=>{
               </h3>
               <ul class="d-flex gap-4 list-unstyled">
                 <li
-                  class="card-info px-4 py-5 bg-neutral-0 border border-primary-40 rounded-3"
+                  class="card-info px-4 py-4 bg-neutral-0 border border-primary-40 rounded-3"
                 >
                   <Icon
                     class="mb-2 fs-5 text-primary-100"
@@ -148,24 +154,24 @@ onMounted(()=>{
                   <p class="mb-0 fw-bold text-neutral-80 text-nowrap">24 坪</p>
                 </li>
                 <li
-                  class="card-info px-4 py-5 bg-neutral-0 border border-primary-40 rounded-3"
+                  class="card-info px-3 py-4 bg-neutral-0 border border-primary-40 rounded-3"
                 >
                   <Icon
                     class="mb-2 fs-5 text-primary-100"
                     icon="material-symbols:king-bed"
                   />
                   <p class="mb-0 fw-bold text-neutral-80 text-nowrap">
-                    1 張大床
+                    {{roomData.bedInfo}}
                   </p>
                 </li>
                 <li
-                  class="card-info px-4 py-5 bg-neutral-0 border border-primary-40 rounded-3"
+                  class="card-info px-4 py-4 bg-neutral-0 border border-primary-40 rounded-3"
                 >
                   <Icon
                     class="mb-2 fs-5 text-primary-100"
                     icon="ic:baseline-person"
                   />
-                  <p class="mb-0 fw-bold text-neutral-80 text-nowrap">2-4 人</p>
+                  <p class="mb-0 fw-bold text-neutral-80 text-nowrap">2-{{ roomData.maxPeople }} 人</p>
                 </li>
               </ul>
             </section>
@@ -179,41 +185,15 @@ onMounted(()=>{
               <ul
                 class="d-flex flex-wrap gap-6 gap-md-10 p-6 bg-neutral-0 fs-8 fs-md-7 rounded-3 list-unstyled"
               >
-                <li class="d-flex gap-2">
+                <li class="d-flex gap-2" v-for="item in roomData.layoutInfo" :key="item.title">                
                   <Icon
                     class="fs-5 text-primary-100"
                     icon="material-symbols:check"
                   />
-                  <p class="mb-0 text-neutral-80 fw-bold">市景</p>
+                  <p class="mb-0 text-neutral-80 fw-bold">{{ item.title }}</p>
                 </li>
-                <li class="d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">獨立衛浴</p>
-                </li>
-                <li class="d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">客廳</p>
-                </li>
-                <li class="d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">書房</p>
-                </li>
-                <li class="d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">樓層電梯</p>
-                </li>
+                
+
               </ul>
             </section>
 
@@ -222,81 +202,18 @@ onMounted(()=>{
                 class="title-deco mb-4 mb-md-6 text-neutral-100 fs-7 fs-md-5 fw-bold"
               >
                 房內設備
-              </h3>
-              <ul
-                class="d-flex flex-wrap row-gap-2 column-gap-10 p-6 mb-0 bg-neutral-0 fs-8 fs-md-7 rounded-3 list-unstyled"
-              >
-                <li class="flex-item d-flex gap-2">
+              </h3> 
+              <ul class="info">
+                <li class="info-item" v-for="facility in roomData.facilityInfo" :key="facility.title">
                   <Icon
-                    class="fs-5 text-primary-100"
+                    class="fs-5 text-primary-100 info-icon"
                     icon="material-symbols:check"
                   />
-                  <p class="mb-0 text-neutral-80 fw-bold">平面電視</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">吹風機</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">冰箱</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">熱水壺</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">檯燈</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">衣櫃</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">除濕機</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">浴缸</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">書桌</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">音響</p>
-                </li>
+                  <p class="mb-0 text-neutral-80 fw-bold">{{ facility.title }}</p>
+                </li>                
               </ul>
+
+              
             </section>
 
             <section>
@@ -305,79 +222,15 @@ onMounted(()=>{
               >
                 備品提供
               </h3>
-              <ul
-                class="d-flex flex-wrap row-gap-2 column-gap-10 p-6 mb-0 bg-neutral-0 fs-8 fs-md-7 rounded-3 list-unstyled"
-              >
-                <li class="flex-item d-flex gap-2">
+              <ul class="info">
+                <li class="info-item" v-for="amenity in roomData.amenityInfo" :key="amenity.title">
                   <Icon
-                    class="fs-5 text-primary-100"
+                    class="fs-5 text-primary-100 info-icon"
                     icon="material-symbols:check"
                   />
-                  <p class="mb-0 text-neutral-80 fw-bold">衛生紙</p>
+                  <p class="mb-0 text-neutral-80 fw-bold">{{ amenity.title }}</p>
                 </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">拖鞋</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">沐浴用品</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">清潔用品</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">刮鬍刀</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">吊衣架</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">浴巾</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">刷牙用品</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">罐裝水</p>
-                </li>
-                <li class="flex-item d-flex gap-2">
-                  <Icon
-                    class="fs-5 text-primary-100"
-                    icon="material-symbols:check"
-                  />
-                  <p class="mb-0 text-neutral-80 fw-bold">梳子</p>
-                </li>
+               
               </ul>
             </section>
 
@@ -427,15 +280,14 @@ onMounted(()=>{
               </h5>
 
               <div class="text-neutral-80">
-                <h2 class="fw-bold">尊爵雙人房</h2>
+                <h2 class="fw-bold">{{ roomData.name }}</h2>
                 <p class="mb-0 fw-medium">
-                  享受高級的住宿體驗，尊爵雙人房提供給您舒適寬敞的空間和精緻的裝潢。
+                  {{ roomData.description }}
                 </p>
               </div>
 
               <div>
-                <div class="d-flex flex-wrap gap-2 mb-4">
-                  <div>{{ bookingDate.date.start }}</div>
+                <div class="d-flex flex-wrap gap-2 mb-4">               
                   <div class="form-floating flex-grow-1 flex-shrink-1">
                     <input
                       id="checkinInput"
@@ -517,9 +369,9 @@ onMounted(()=>{
                     </button>
                   </div>
                 </div>
-              </div>
+              </div>           
 
-              <h5 class="mb-0 text-primary-100 fw-bold">NT$ 10,000</h5>
+              <h5 class="mb-0 text-primary-100 fw-bold">NT$ {{thousandSeparator( totalPrice) }}</h5>
               <NuxtLink
                 :to="{
                   name: 'rooms-roomId-booking',
@@ -538,7 +390,7 @@ onMounted(()=>{
         class="d-flex d-md-none justify-content-between align-items-center position-fixed bottom-0 w-100 p-3 bg-neutral-0"
       >
         <template v-if="bookingDate.date.end === null">
-          <small class="text-neutral-80 fw-medium">ＮＴ$ 10,000 / 晚</small>
+          <small class="text-neutral-80 fw-medium">ＮＴ$ {{thousandSeparator( roomData.price) }} / 晚</small>
           <button
             class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
             type="button"
@@ -549,9 +401,9 @@ onMounted(()=>{
         </template>
 
         <template v-else>
-          <div class="d-flex flex-column gap-1">
+          <div class="d-flex flex-column gap-1">            
             <small class="text-neutral-80 fw-medium"
-              >ＮＴ$ 10,000 / {{ daysCount }} 晚 / {{ bookingPeople }} 人</small
+              >ＮＴ$ {{thousandSeparator( totalPrice) }} / {{ daysCount }} 晚 / {{ bookingPeople }} 人</small
             >
 
             <span class="text-neutral fs-9 fw-medium text-decoration-underline"
@@ -633,5 +485,25 @@ $grid-breakpoints: (
 
 input[type="date"] {
   cursor: pointer;
+}
+
+.info{
+  background-color:white;
+  list-style: none;
+  padding: 24px;
+  border-radius: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  display: grid;
+  row-gap: 8px;
+  .info-item{
+    display: flex;
+    .info-icon{
+      margin-right: 8px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 </style>
