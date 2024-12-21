@@ -8,10 +8,13 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
+
 const config = useRuntimeConfig();
 const baseURL= config.public.apiBaseURL;
 
 const modules = ref([Autoplay, Navigation, Pagination]);
+const { thousandSeparator } = useThousandSeparator(); 
+
 const roomList = ref({})
 
 const importImage = (url) => {
@@ -289,12 +292,12 @@ onMounted(()=>{
                   <div
                     class="d-flex justify-content-between align-items-center fs-7 fs-md-5 text-primary-100"
                   >
-                    <p class="mb-0 fw-bold">NT$ {{room.price}}</p>
+                    <p class="mb-0 fw-bold">NT$ {{thousandSeparator(room.price)}}</p>
                     <NuxtLink
                       :to="{
                         name: 'rooms-roomId',
                         params: {
-                          roomId: 'a',
+                          roomId: room._id,
                         },
                       }"
                       class="icon-link icon-link-hover text-primary-100"

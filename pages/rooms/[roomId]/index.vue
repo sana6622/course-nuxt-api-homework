@@ -2,18 +2,25 @@
 import { reactive } from "vue";
 const { $formatDate } = useNuxtApp();
 import DatePickerModal from "@/components/rooms/DatePickerModal.vue";
+
 import { Icon } from "@iconify/vue";
 
+const config = useRuntimeConfig();
+const baseURL= config.public.apiBaseURL;
+
+const route = useRoute();
+const roomId = route.params.roomId;
+const roomData = ref({})
+
 const datePickerModal = ref(null);
+const MAX_BOOKING_PEOPLE = 10;
+const bookingPeople = ref(1);
+const daysCount = ref(0);
+
 
 const openModal = () => {
   datePickerModal.value.openModal();
 };
-
-const MAX_BOOKING_PEOPLE = 10;
-const bookingPeople = ref(1);
-
-const daysCount = ref(0);
 
 const daysFormatOnMobile = (date) => {
   if (date != "") {
@@ -22,13 +29,11 @@ const daysFormatOnMobile = (date) => {
   return ""; // 如果 date 無效或不是字串，返回空字串
 };
 
-const formatDate = (date) => {
-  const offsetToUTC8 = date.getHours() + 8;
-  date.setHours(offsetToUTC8);
-  return date.toISOString().split("T")[0];
-};
-
-const currentDate = new Date();
+// const formatDate = (date) => {
+//   const offsetToUTC8 = date.getHours() + 8;
+//   date.setHours(offsetToUTC8);
+//   return date.toISOString().split("T")[0];
+// };
 
 const bookingDate = reactive({
   date: {
@@ -48,11 +53,22 @@ const handleDateChange = (bookingInfo) => {
   daysCount.value = bookingInfo.daysCount;
 };
 
-onBeforeMount(() => {
-  const currentDate = new Date();
-  console.log("currnet", currentDate);
-  bookingDate.date.start = $formatDate(currentDate, "iso");
-  console.log("bookingDate.date", bookingDate.date);
+const getRoomData = async(id) => {
+  console.log('roomid' , id)
+  try {
+    const data = await $fetch(`/api/v1/rooms/${id}`, {
+      baseURL: config.public.apiBaseURL,
+    });
+    roomData.value = data.result
+    console.log('roomData.value',roomData.value)
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+  }
+
+}
+onBeforeMount(() => {   
+  const currentDate = new Date(); 
+  bookingDate.date.start = $formatDate(currentDate, "iso");  
   bookingDate.minDate = currentDate;
   bookingDate.maxDate = new Date(
     currentDate.getFullYear() + 1,
@@ -60,6 +76,10 @@ onBeforeMount(() => {
     currentDate.getDate()
   );
 });
+
+onMounted(()=>{
+  getRoomData(roomId)
+})
 </script>
 
 <template>
