@@ -9,10 +9,13 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (!value) return ""; // 如果值為 null 或 undefined，返回空字串
       
       const date = new Date(value);
+      console.log('date',date)
       if (type === 'mobile') {
         return format(date, 'MM/dd'); // 手機格式
       } else if (type === 'iso') {
         return format(date, 'yyyy-MM-dd'); // ISO 格式
+      }else if (type === 'week') {
+        return format(date, 'MM 月 dd 日 EEEE', { locale: zhTW }); // 星期
       }  else {
         return format(date, 'yyyy/MM/dd'); // 默認格式
       }

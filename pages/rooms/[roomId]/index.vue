@@ -5,10 +5,15 @@ import DatePickerModal from "@/components/rooms/DatePickerModal.vue";
 
 import { Icon } from "@iconify/vue";
 
+import { useOrderStore } from "@/stores/order";
+const orderStore = useOrderStore()
+
 const config = useRuntimeConfig();
 const baseURL= config.public.apiBaseURL;
+const { $swal } = useNuxtApp();
 
 const route = useRoute();
+const router = useRouter();
 const roomId = route.params.roomId;
 const roomData = ref({})
 
@@ -69,8 +74,46 @@ const getRoomData = async(id) => {
 
 }
 const totalPrice = computed(()=>{
-   return bookingPeople.value*daysCount.value.value*price.value
+   return daysCount.value.value*price.value
 })
+
+const bookHandle = ()=>{
+  if(bookingPeople.value*daysCount.value*price.value == 0){   
+    showAlert()
+    return
+  }
+  const orderData = {
+    roomData: roomData.value,
+    bookingDate: {
+      start: bookingDate.date.start,
+      end: bookingDate.date.end,
+    },
+    bookingPeople: bookingPeople.value,   
+    dayCount : daysCount.value
+  };
+
+  
+  orderStore.setOrderData(
+    orderData.roomData,
+    orderData.bookingDate,
+    orderData.bookingPeople,
+    orderData.dayCount
+
+  );
+ 
+  router.push({
+    name: "rooms-roomId-booking",
+    params: { roomId: route.params.roomId },
+  });
+}
+const showAlert = () => {
+  $swal.fire({
+    title: '尚未選擇退房日期',    
+    icon: 'error',
+    showCancelButton: false,
+    confirmButtonText: '是',
+  })
+};
 
 onBeforeMount(() => {   
   const currentDate = new Date(); 
@@ -151,7 +194,7 @@ onMounted(()=>{
                     class="mb-2 fs-5 text-primary-100"
                     icon="fluent:slide-size-24-filled"
                   />
-                  <p class="mb-0 fw-bold text-neutral-80 text-nowrap">24 坪</p>
+                  <p class="mb-0 fw-bold text-neutral-80 text-nowrap">{{ roomData.areaInfo }}</p>
                 </li>
                 <li
                   class="card-info px-3 py-4 bg-neutral-0 border border-primary-40 rounded-3"
@@ -183,11 +226,11 @@ onMounted(()=>{
                 房間格局
               </h3>
               <ul
-                class="d-flex flex-wrap gap-6 gap-md-10 p-6 bg-neutral-0 fs-8 fs-md-7 rounded-3 list-unstyled"
+                class="info"
               >
-                <li class="d-flex gap-2" v-for="item in roomData.layoutInfo" :key="item.title">                
+                <li class="info-item" v-for="item in roomData.layoutInfo" :key="item.title">                
                   <Icon
-                    class="fs-5 text-primary-100"
+                    class="fs-5 text-primary-100 info-icon"
                     icon="material-symbols:check"
                   />
                   <p class="mb-0 text-neutral-80 fw-bold">{{ item.title }}</p>
@@ -372,7 +415,8 @@ onMounted(()=>{
               </div>           
 
               <h5 class="mb-0 text-primary-100 fw-bold">NT$ {{thousandSeparator( totalPrice) }}</h5>
-              <NuxtLink
+              <button class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc" @click="bookHandle">立即預訂</button>
+              <!-- <NuxtLink
                 :to="{
                   name: 'rooms-roomId-booking',
                   params: { roomId: $route.params.roomId },
@@ -380,7 +424,7 @@ onMounted(()=>{
                 class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
               >
                 立即預訂
-              </NuxtLink>
+              </NuxtLink> -->
             </div>
           </div>
         </div>
@@ -411,7 +455,8 @@ onMounted(()=>{
               {{ daysFormatOnMobile(bookingDate.date?.end) }}</span
             >
           </div>
-          <NuxtLink
+          <button class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc" @click="bookHandle">立即預訂</button>
+          <!-- <NuxtLink
             :to="{
               name: 'rooms-roomId-booking',
               params: { roomId: $route.params.roomId },
@@ -419,7 +464,7 @@ onMounted(()=>{
             class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3 bt-bgc"
           >
             立即預訂
-          </NuxtLink>
+          </NuxtLink> -->
         </template>
       </div>
     </section>
@@ -492,11 +537,15 @@ input[type="date"] {
   list-style: none;
   padding: 24px;
   border-radius: 8px;
-  grid-template-columns: repeat(4, 1fr);
-  display: grid;
+  display: flex;
+  flex-wrap:wrap;
   row-gap: 8px;
+
   .info-item{
+    width: 20%;
+    min-width:115px;
     display: flex;
+    white-space: nowrap;
     .info-icon{
       margin-right: 8px;
     }

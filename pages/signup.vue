@@ -2,9 +2,152 @@
 definePageMeta({
   layout: "account-layout",
 });
+
+
+const config = useRuntimeConfig();
+const baseURL= config.public.apiBaseURL;
+const { $swal } = useNuxtApp();
+
+const route = useRoute();
+const router = useRouter();
+
+
+const signupFormData = ref({
+  email: "",
+  password: "",
+  name: "",
+  phone:"",
+  address: {
+    city: "",
+    district: "",
+    detail: "",
+  },
+  birthday: {
+    year: "",
+    month: "",
+    day: "",
+  },
+});
+const checkPassword =ref('')
+const agreement = ref(false)
+
+
 import { Icon } from "@iconify/vue";
 
 const isEmailAndPasswordValid = ref(false);
+
+const samePassword = () => { 
+ if(signupFormData.value.password === checkPassword.value){
+  return true
+ }else {
+  return false
+ }
+}
+
+const nextStep = () => {
+  const checkout = samePassword()
+  if(signupFormData.email !="" && checkout == true){
+    isEmailAndPasswordValid.value = true
+  } else(
+      $swal.fire({
+      title: '資料填寫不正確，請確認',    
+      icon: 'error',
+      showCancelButton: false,
+      confirmButtonText: '是',
+   })
+  )  
+}
+
+const submitSignupForm = () => {
+  // 整理出生日為 yyyy-MM-dd 格式
+  const { year, month, day } = signupFormData.value.birthday;
+  console.log('signupFormData.value.birthday',signupFormData.value.birthday)
+  console.log(year, month, day)
+    // 如果任何一項未填寫，返回提示
+    if (!year || !month || !day) {
+    $swal.fire({
+      title: "資料不完整",
+      text: "請完整選擇生日資料",
+      icon: "error",
+      confirmButtonText: "確定",
+    });
+    return;
+  }
+
+  const formattedbirthday = `${year+1958}/${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}`;
+
+  // 整理資料
+  const data = {
+    ...signupFormData.value,
+    birthday: formattedbirthday,
+    address: {
+      zipcode:802,
+      detail:`${signupFormData.value.address.detail}`
+    },
+  };
+
+  // 呼叫 API
+  createUserAccount(data);
+};
+
+
+
+const createUserAccount = async(data) => {
+  console.log('data',data)
+  console.log('agreement',agreement.value)
+  if(!agreement.value){
+    await $swal.fire({
+      title: "錯誤",
+      text: "請勾選同意條款後再進行註冊。",
+      icon: "error",
+      confirmButtonText: "確定",
+    });
+    return;
+    
+  }
+
+   try{
+    const res = await $fetch("api/v1/user/signup", {
+      method: "POST",
+      baseURL: config.public.apiBaseURL, 
+      body:data,
+    })
+    console.log('res',res); 
+    // 使用 SweetAlert2 顯示註冊成功的提示
+    await $swal.fire({
+      title: "註冊成功！",
+      text: "您的帳戶已創建成功，請立即登入！",
+      icon: "success",
+      confirmButtonText: "確定",
+    });
+    router.push("/login");    
+
+   }catch(error) {
+    console.log('error',error);
+      const { message } = error.response._data;
+      // message 有陣列 [] 和字串 "" 兩種回應格式
+      if (Array.isArray(message)) {
+      await $swal.fire({
+        title: "註冊失敗",
+        text: message.join("、"), // 以「、」分隔訊息
+        icon: "error",
+        confirmButtonText: "確定",
+      });
+    } else {
+      await $swal.fire({
+        title: "註冊失敗",
+        text: message || "發生未知錯誤，請稍後再試。",
+        icon: "error",
+        confirmButtonText: "確定",
+      });
+    }
+   }finally{
+    signupFormData.value = {}; // 清空註冊表單
+    agreement.value = false; // 解鎖按鈕
+   }
+
+
+};
 </script>
 
 <template>
@@ -54,7 +197,7 @@ const isEmailAndPasswordValid = ref(false);
     </div>
 
     <div class="mb-4">
-      <form :class="{ 'd-none': isEmailAndPasswordValid }" class="mb-4">
+      <form :class="{ 'd-none': isEmailAndPasswordValid }" class="mb-4" @submit.prevent="createAccount(registrationFormData)">
         <div class="mb-4 fs-8 fs-md-7">
           <label class="mb-2 text-neutral-0 fw-bold" for="email">
             電子信箱
@@ -64,6 +207,7 @@ const isEmailAndPasswordValid = ref(false);
             class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
             placeholder="hello@exsample.com"
             type="email"
+            v-model="signupFormData.email"
           />
         </div>
         <div class="mb-4 fs-8 fs-md-7">
@@ -75,6 +219,7 @@ const isEmailAndPasswordValid = ref(false);
             class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
             placeholder="請輸入密碼"
             type="password"
+            v-model="signupFormData.password"
           />
         </div>
         <div class="mb-10 fs-8 fs-md-7">
@@ -86,12 +231,13 @@ const isEmailAndPasswordValid = ref(false);
             class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
             placeholder="請再輸入一次密碼"
             type="password"
+            v-model="checkPassword"
           />
         </div>
         <button
           class="btn btn-neutral-40 w-100 py-4 text-neutral-60 fw-bold"
           type="button"
-          @click="isEmailAndPasswordValid = true"
+          @click="nextStep"
         >
           下一步
         </button>
@@ -104,6 +250,7 @@ const isEmailAndPasswordValid = ref(false);
             class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 rounded-3"
             placeholder="請輸入姓名"
             type="text"
+            v-model ="signupFormData.name"
           />
         </div>
         <div class="mb-4 fs-8 fs-md-7">
@@ -115,6 +262,7 @@ const isEmailAndPasswordValid = ref(false);
             class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 rounded-3"
             placeholder="請輸入手機號碼"
             type="tel"
+            v-model="signupFormData.phone"
           />
         </div>
         <div class="mb-4 fs-8 fs-md-7">
@@ -123,22 +271,25 @@ const isEmailAndPasswordValid = ref(false);
             <select
               id="birth"
               class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+               v-model="signupFormData.birthday.year"
             >
               <option
                 v-for="year in 65"
                 :key="year"
-                value="`${year + 1958} 年`"
+                :value= "year"
               >
                 {{ year + 1958 }} 年
               </option>
             </select>
-            <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-              <option v-for="month in 12" :key="month" value="`${month} 月`">
+            <select class="form-select p-4 text-neutral-80 fw-medium rounded-3" 
+            v-model="signupFormData.birthday.month">
+              <option v-for="month in 12" :key="month" :value=" month">
                 {{ month }} 月
               </option>
             </select>
-            <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-              <option v-for="day in 30" :key="day" value="`${day} 日`">
+            <select class="form-select p-4 text-neutral-80 fw-medium rounded-3"  
+            v-model="signupFormData.birthday.day">
+              <option v-for="day in 30" :key="day" :value="day">
                 {{ day }} 日
               </option>
             </select>
@@ -152,6 +303,7 @@ const isEmailAndPasswordValid = ref(false);
             <div class="d-flex gap-2 mb-2">
               <select
                 class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                 v-model="signupFormData.address.city"
               >
                 <option value="臺北市">臺北市</option>
                 <option value="臺中市">臺中市</option>
@@ -159,6 +311,7 @@ const isEmailAndPasswordValid = ref(false);
               </select>
               <select
                 class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                v-model="signupFormData.address.district"
               >
                 <option value="前金區">前金區</option>
                 <option value="鹽埕區">鹽埕區</option>
@@ -170,6 +323,7 @@ const isEmailAndPasswordValid = ref(false);
               type="text"
               class="form-control p-4 rounded-3"
               placeholder="請輸入詳細地址"
+             v-model="signupFormData.address.detail"
             />
           </div>
         </div>
@@ -181,7 +335,7 @@ const isEmailAndPasswordValid = ref(false);
             id="agreementCheck"
             class="form-check-input"
             type="checkbox"
-            value=""
+            v-model="agreement"
           />
           <label class="form-check-label fw-bold" for="agreementCheck">
             我已閱讀並同意本網站個資使用規範
@@ -190,6 +344,7 @@ const isEmailAndPasswordValid = ref(false);
         <button
           class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold"
           type="button"
+          @click="submitSignupForm"
         >
           完成註冊
         </button>
