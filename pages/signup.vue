@@ -33,6 +33,7 @@ const agreement = ref(false)
 
 
 import { Icon } from "@iconify/vue";
+const { cityArea } = useCity();
 
 const isEmailAndPasswordValid = ref(false);
 
@@ -145,8 +146,15 @@ const createUserAccount = async(data) => {
     signupFormData.value = {}; // 清空註冊表單
     agreement.value = false; // 解鎖按鈕
    }
+  }
 
+const selectCity = ref("");
+const filterAreas = ref([]);
 
+const updateAreas = () => {
+  filterAreas.value = selectCity.value.areas;
+
+  console.log("filterArea", filterArea);
 };
 </script>
 
@@ -302,20 +310,25 @@ const createUserAccount = async(data) => {
           <div>
             <div class="d-flex gap-2 mb-2">
               <select
-                class="form-select p-4 text-neutral-80 fw-medium rounded-3"
-                 v-model="signupFormData.address.city"
+                class="form-select p-4 text-neutral-80 fw-medium rounded-3"    
+                v-model="selectCity"
+                @change="updateAreas"
               >
-                <option value="臺北市">臺北市</option>
-                <option value="臺中市">臺中市</option>
-                <option selected value="高雄市">高雄市</option>
+                <option :value="city" v-for="city in cityArea" :key="city">
+                  {{ city.city }}
+                </option>
               </select>
               <select
                 class="form-select p-4 text-neutral-80 fw-medium rounded-3"
                 v-model="signupFormData.address.district"
               >
-                <option value="前金區">前金區</option>
-                <option value="鹽埕區">鹽埕區</option>
-                <option selected value="新興區">新興區</option>
+                <option
+                  :value="area"
+                  v-for="itemArea in filterAreas"
+                  :key="itemArea"
+                >
+                  {{ itemArea.area }}
+                </option>
               </select>
             </div>
             <input
