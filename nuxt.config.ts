@@ -7,4 +7,9 @@ export default defineNuxtConfig({
     { src: "~/plugins/bootstrap.client.js", ssr: false },
     "~/plugins/formatDate.js",
   ],
+  runtimeConfig: {
+    public: {
+      apiBaseURL: process.env.API_BASE_URL || 'https://nuxr3.zeabur.app/',
+    },
+  },
 });
