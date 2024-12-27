@@ -117,7 +117,7 @@ const createUserAccount = async (data) => {
   } catch (error) {
     console.log("error", error);
     const { message } = error.response._data;
-    // message 有陣列 [] 和字串 "" 兩種回應格式
+
     if (Array.isArray(message)) {
       await $swal.fire({
         title: "註冊失敗",

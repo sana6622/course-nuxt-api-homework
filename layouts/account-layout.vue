@@ -85,7 +85,6 @@ import { Icon } from "@iconify/vue";
         </picture>
 
         <main class="position-relative w-100 w-md-auto">
-          <!-- <RouterView /> -->
           <slot />
         </main>
       </div>
